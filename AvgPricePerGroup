@@ -181,35 +181,3 @@ class Category {
 		return "Category [category=" + category + ", minRange=" + minRange + ", maxRange=" + maxRange + "]";
 	}
 }
-class Margins{
-	String caterogy;
-	String margin;
-	
-	public Margins() {
-		super();
-		// TODO Auto-generated constructor stub
-	}
-	public Margins(String caterogy, String margin) {
-		super();
-		this.caterogy = caterogy;
-		this.margin = margin;
-	}
-	public String getCaterogy() {
-		return caterogy;
-	}
-	public void setCaterogy(String caterogy) {
-		this.caterogy = caterogy;
-	}
-	public String getMargin() {
-		return margin;
-	}
-	public void setMargin(String margin) {
-		this.margin = margin;
-	}
-	@Override
-	public String toString() {
-		return "Margins [caterogy=" + caterogy + ", margin=" + margin + "]";
-	}
-	
-	
-}
