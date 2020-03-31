@@ -1,0 +1,215 @@
+package com.test;
+
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+public class AvgPriceOfProduct {
+public static void main(String[] args) {
+	List<Product> alProducts = new ArrayList<Product>();
+	Product  p1 = new Product("A", "G1", 20.1f);
+	Product  p2 = new Product("B", "G2", 98.4f);
+	Product  p3 = new Product("C", "G1", 49.7f);
+	Product  p4 = new Product("D", "G3", 35.8f);
+	Product  p5 = new Product("E", "G3", 105.5f);
+	Product  p6 = new Product("F", "G1", 55.2f);
+	Product  p7 = new Product("G", "G1", 12.7f);
+	Product  p8 = new Product("H", "G3", 88.6f);
+	Product  p9 = new Product("I", "G1", 5.2f);
+	Product  p10 = new Product("J", "G2", 72.4f);
+	alProducts.add(p1);alProducts.add(p2);alProducts.add(p3);
+	alProducts.add(p4);alProducts.add(p5);alProducts.add(p6);
+	alProducts.add(p7);alProducts.add(p8);alProducts.add(p9);alProducts.add(p10);
+	
+	List<Category> categories = new ArrayList<Category>();
+	Category category = new Category("C3", 50, 75);
+	Category category1 = new Category("C4", 75, 100);
+	Category category2 = new Category("C2", 25, 50);
+	Category category3 = new Category("C1", 0, 25);
+	Category category4 = new Category("C5", 100, null);
+	categories.add(category);categories.add(category1);
+	categories.add(category2);categories.add(category3);
+	categories.add(category4);
+	HashMap<String, String> margins = new HashMap<String, String>();
+	          margins.put("C1", "20%");
+	          margins.put("C2", "30%");
+	          margins.put("C3", "0.4");
+	          margins.put("C4", "50%");
+	          margins.put("C5", "0.6");
+	BigDecimal defaultValue = new BigDecimal("99999.9");
+	HashMap<String,BigDecimal> pricesPerGroupMap = new HashMap<String,BigDecimal>();
+	HashMap<String,Integer> groupSize = new HashMap<String,Integer>();
+	
+	HashMap<String,BigDecimal> avgPricePerGroupMap = new HashMap<String,BigDecimal>();
+	
+	//System.out.println(defaultValue);
+	for (Category cat : categories) {
+		String caterogyId = cat.category;
+		 BigDecimal min = BigDecimal.valueOf(cat.minRange);
+		 BigDecimal max = null;
+		 if(cat.maxRange!=null)
+		  max = BigDecimal.valueOf(cat.maxRange);
+		 else {
+			 max = defaultValue;
+		 }
+          
+       
+		for (Product prod : alProducts) {
+			 BigDecimal currProductPrice = BigDecimal.valueOf(prod.cost);
+			 String group = prod.group;
+			 if(currProductPrice.compareTo(min)>=0 && currProductPrice.compareTo(max)==-1) {
+				 String selectedMarginAsString = margins.get(caterogyId);
+				 BigDecimal selMargin = null;
+				 if (selectedMarginAsString.endsWith("%")) {
+					 selMargin = new BigDecimal(selectedMarginAsString.trim().replace("%", "")).divide(BigDecimal.valueOf(100));
+				 }
+				 else {
+	                    selMargin = new BigDecimal(selectedMarginAsString);
+	                }
+				 BigDecimal value = currProductPrice.multiply(selMargin.add(new BigDecimal(1)));
+				 
+				 if(pricesPerGroupMap.containsKey(group)) {
+					 BigDecimal sumOfPrice = pricesPerGroupMap.get(group).add(value);
+				 pricesPerGroupMap.put(group, sumOfPrice);
+				 groupSize.put(group, groupSize.get(group)+1);
+				 }
+				 else {
+					 pricesPerGroupMap.put(group, value);
+					 groupSize.put(group, 1);
+				 }
+				}
+				
+			 }
+		}
+		
+	System.out.println("pricesPerGroupMap: "+pricesPerGroupMap);
+	System.out.println("Each Group Size: "+groupSize);
+	for (Map.Entry<String, BigDecimal> entry : pricesPerGroupMap.entrySet()) {
+	   
+		for (Map.Entry<String, Integer> entry1 : groupSize.entrySet()) {
+		   if(entry1.getKey().equals(entry.getKey())) {
+			   BigDecimal avgValue = entry.getValue().divide(BigDecimal.valueOf(entry1.getValue()),1, RoundingMode.UP);
+			   avgPricePerGroupMap.put(entry1.getKey(), avgValue);
+		   }	
+		}
+	}
+	System.out.println("avgPricePerGroup: "+avgPricePerGroupMap);
+	}
+	
+	
+	
+	
+}
+
+
+class Product{
+	String product;
+	String group;
+	Float cost;
+	
+	public Product() {
+		super();
+	}
+	public Product(String product, String group, Float cost) {
+		super();
+		this.product = product;
+		this.group = group;
+		this.cost = cost;
+	}
+	public String getProduct() {
+		return product;
+	}
+	public void setProduct(String product) {
+		this.product = product;
+	}
+	@Override
+	public String toString() {
+		return "Product [product=" + product + ", group=" + group + ", cost=" + cost + "]";
+	}
+	public String getGroup() {
+		return group;
+	}
+	public void setGroup(String group) {
+		this.group = group;
+	}
+	public Float getCost() {
+		return cost;
+	}
+	public void setCost(Float cost) {
+		this.cost = cost;
+	}
+	
+}
+
+class Category {
+	String category;
+	Integer minRange;
+	Integer maxRange;
+	
+	public Category() {
+		super();
+	}
+	public Category(String category, Integer minRange, Integer maxRange) {
+		super();
+		this.category = category;
+		this.minRange = minRange;
+		this.maxRange = maxRange;
+	}
+	public String getCategory() {
+		return category;
+	}
+	public void setCategory(String category) {
+		this.category = category;
+	}
+	public Integer getMinRange() {
+		return minRange;
+	}
+	public void setMinRange(Integer minRange) {
+		this.minRange = minRange;
+	}
+	public Integer getMaxRange() {
+		return maxRange;
+	}
+	public void setMaxRange(Integer maxRange) {
+		this.maxRange = maxRange;
+	}
+	@Override
+	public String toString() {
+		return "Category [category=" + category + ", minRange=" + minRange + ", maxRange=" + maxRange + "]";
+	}
+}
+class Margins{
+	String caterogy;
+	String margin;
+	
+	public Margins() {
+		super();
+		// TODO Auto-generated constructor stub
+	}
+	public Margins(String caterogy, String margin) {
+		super();
+		this.caterogy = caterogy;
+		this.margin = margin;
+	}
+	public String getCaterogy() {
+		return caterogy;
+	}
+	public void setCaterogy(String caterogy) {
+		this.caterogy = caterogy;
+	}
+	public String getMargin() {
+		return margin;
+	}
+	public void setMargin(String margin) {
+		this.margin = margin;
+	}
+	@Override
+	public String toString() {
+		return "Margins [caterogy=" + caterogy + ", margin=" + margin + "]";
+	}
+	
+	
+}
